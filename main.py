@@ -21,7 +21,7 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pass
             
-        board.start_game_board(WIN)
+        board.draw(WIN)
         pygame.display.update()
                 
     pygame.quit()
