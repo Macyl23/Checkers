@@ -2,25 +2,25 @@ import pygame
 from .constants import ROWS, COLS, SQUARE_SIZE, WHITE, BLUE, RED
 from .piece import Piece
 
+
 class Board:
     def __init__(self):
         self.board = []
-        self.start_game_board()
+        self.creer_grille()
         self.red_kings = 0
         self.blue_kings = 0
-        
-    def squares(self, window):
+
+    def creer_cases(self, window):
         window.fill(WHITE)
         for row in range(ROWS):
-            for col in range (row % 2, ROWS, 2):
-                pygame.draw.rect(window, BLUE, (row*SQUARE_SIZE, col*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
-                
-                
-    
-    def start_game_board(self):
-        for row in range (ROWS):
+            for col in range(row % 2, ROWS, 2):
+                pygame.draw.rect(window, BLUE, (row*SQUARE_SIZE,
+                                 col*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+
+    def creer_grille(self):
+        for row in range(ROWS):
             self.board.append([])
-            for col in range (COLS):
+            for col in range(COLS):
                 if col % 2 == ((row + 1) % 2):
                     if row < 3:
                         self.board[row].append(Piece(row, col, RED))
@@ -30,130 +30,163 @@ class Board:
                         self.board[row].append(0)
                 else:
                     self.board[row].append(0)
-                    
-    def draw(self,win):
-        self.squares(win)
-        for row in range (ROWS):
-            for col in range (COLS):
+
+    def ajouter_pieces_sur_grille(self, win):
+        self.creer_cases(win)
+        for row in range(ROWS):
+            for col in range(COLS):
                 piece = self.board[row][col]
                 if piece != 0:
-                   piece.create_piece(win)
-                   
-    def move(self, piece, row, col):
+                    piece.create_piece(win)
+
+    def change_position_sur_grille(self, piece, row, col):
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
         piece.move_piece(row, col)
         
-        if row== ROWS - 1 or row == 0:
-            piece.get_king()
-            if piece.color ==  RED:
-                self.red_kings += 1
-            else:
-                self.blue_kings += 1
-                
+        
     def get_piece(self, row, col):
         return self.board[row][col]
-    
-    def remove(self, pieces):
+
+    def eliminer_pieces(self, pieces):
         for piece in pieces:
             self.board[piece.row][piece.col] = 0
-    
-            
-    def get_valid_moves(self, piece):
+
+    def valid_moves(self, piece):
         moves = {}
         left = piece.col - 1
         right = piece.col + 1
         row = piece.row
-        
-        if piece.color == BLUE or piece.king:
-            moves.update(self._traverse_left(row - 1, max(row-3, -1), -1, piece.color, left))
-            moves.update(self._traverse_right(row - 1, max(row-3, -1), -1, piece.color, right))
-        if piece.color == RED or piece.king:
-            moves.update(self._traverse_left(row + 1, min(row+3, ROWS), 1, piece.color, left))
-            moves.update(self._traverse_right(row + 1, min(row+3, ROWS), 1, piece.color, right))
-            
+
+        if piece.color == BLUE:
+            moves.update(self._valid_moves_left(row-1, 0, -1, piece.color, left))
+            moves.update(self._valid_moves_right(row-1, 0, -1, piece.color, right))
+
+        if piece.color == RED:
+            moves.update(self._valid_moves_left(row+1, ROWS, 1, piece.color, left))
+            moves.update(self._valid_moves_right(row+1, ROWS, 1, piece.color, right))
+
         return moves
-    
-    def _traverse_left(self, start, stop, step, color, left, skipped=[]):
+
+    def _valid_moves_left(self, start, stop, step, color, left, pions_manges=False):
+        derniere_piece_tuee = []
         moves = {}
-        last = []
-        
-        for r in range (start,stop,step):
+        for r in range(start,stop,step):
             
             if left < 0:
                 break
-            current = self.board[r][left]
-            if current == 0:
-                if skipped and not last:
-                    break
-                elif skipped:
-                    
-                    moves[(r, left)] = last + skipped
-                else:
-                    
-                    moves[(r, left)] = last
-
-                if last:
-                    if step == -1:
-                        row = max(r -3, 0)
-                    else:
-                        row = min(r+3, ROWS)
-                    moves.update(self._traverse_left(r+step, row, step, color, left-1,skipped=last))
-                    moves.update(self._traverse_right(r+step, row, step, color, left+1,skipped=last))
+            
+            case_adjacente = self.board[r][left]
+            if self._est_vide(case_adjacente):
                 
-                break 
-            elif current.color == color:
-                break
+                if pions_manges and not derniere_piece_tuee:
+                    return moves
+                
+                else:
+                    moves[(r, left)] = derniere_piece_tuee
+                    if derniere_piece_tuee:
+                           
+                        moves.update(self._valid_moves_left(r+step, self._direction(step), step, color, left-1,True))
+                        print(r+step,left+1)
+                        moves.update(self._valid_moves_right(r+step, self._direction(step), step, color, left+1,True))
+
+                
+                return moves
             else:
-                last = [current]
-                   
+                if case_adjacente.color == color:
+                    return moves
+                else:
+                    derniere_piece_tuee = [case_adjacente]
+                    pions_manges = True
+                      
+            
             left -= 1
             
         return moves
+              
     
-    def _traverse_right(self, start, stop, step, color, right, skipped=[]):
+    def _valid_moves_right(self, start, stop, step, color, right, pions_manges=False):
+        derniere_piece_tuee = []
         moves = {}
-        last = []
-        
-        for r in range (start,stop,step):
+        for r in range(start,stop,step):
+            
             if right >= COLS:
                 break
-            current = self.board[r][right]
-            if current == 0:
-                if skipped and not last:
-                    break
-                elif skipped:
-                    moves[(r, right)] = last + skipped
-                else:
-                    moves[(r, right)] = last
-
-                if last:
-                    if step == -1:
-                        row = max(r -3, 0)
-                    else:
-                        row = min(r+3, ROWS)
-                    moves.update(self._traverse_left(r+step, row, step, color, right-1,skipped=last))
-                    moves.update(self._traverse_right(r+step, row, step, color, right+1,skipped=last))
-                break
-            elif current.color == color:
-                break
-            else:
-                last = [current]
+            
+            
+            case_adjacente = self.board[r][right]
+            if self._est_vide(case_adjacente):
+                if pions_manges and not derniere_piece_tuee:
+                    return moves
                 
+                else:
+                    moves[(r, right)] = derniere_piece_tuee
+                    if derniere_piece_tuee:
+                        
+                        moves.update(self._valid_moves_left(r+step, self._direction(step), step, color, right-1,True))
+                        moves.update(self._valid_moves_right(r+step, self._direction(step), step, color, right+1,True))
+
+                    
+                    return moves
+            else:
+                if case_adjacente.color == color:
+                    return moves
+                else:
+                    derniere_piece_tuee = [case_adjacente]
+                      
+            
             right += 1
             
         return moves
-        
-                     
-                    
 
-            
-    
-    
-    
-                
-                    
+
+    def _next_case_selon_direction(self, step, diagonal,row ):
+        if step == -1:
+            return self.board[row-1][diagonal-1]
+        else:
+            return self.board[row+1][diagonal+1]
         
-  
-                
-                
+    def _direction(self, step):
+        if step == -1:
+            return -1
+        else:
+            return ROWS 
+    def _piece_couleur_differente(self, piece, color):
+        return piece.color != color
     
+    def _est_vide(self, current):
+        return current == 0
+
+    # def _valid_moves_right(self, start, stop, step, color, right, skipped=[]):
+    #     moves = {}
+    #     last = []
+
+    #     for r in range(start, stop,step):
+    #         if right >= COLS:
+    #             break
+    #         current = self.board[r][right]
+    #         if current == 0:
+    #             if skipped and not last:
+    #                 break
+    #             elif skipped:
+    #                 moves[(r, right)] = last + skipped
+    #             else:
+    #                 moves[(r, right)] = last
+
+    #                 if last:
+    #                     if step == -1:
+    #                         row = max(r - 3, 0)
+    #                     else:
+    #                         row = min(r+3, ROWS)
+    #                     moves.update(self._valid_moves_left(
+    #                         r+step, row, step, color, right-1, skipped=last))
+    #                     moves.update(self._valid_moves_right(
+    #                         r+step, row, step, color, right+1, skipped=last))
+    #                 break
+    #         elif current.color == color:
+    #             break
+    #         else:
+    #             last = [current]
+
+    #         right += 1
+
+    #     return moves

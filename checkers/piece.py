@@ -9,8 +9,6 @@ class Piece:
         self.col = col
         self.color = color
         self.king = False
-        self.white_kings = 0
-        self.blue_kings = 0
         self.x = 0
         self.y = 0
         self.calc_pos()
@@ -33,5 +31,8 @@ class Piece:
         self.row = row
         self.col = col
         self.calc_pos()
+        
+    def __repr__(self):
+        return str(self.color)
         
         
