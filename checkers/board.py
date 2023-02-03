@@ -67,7 +67,7 @@ class Board:
 
         return moves
 
-    def _valid_moves_left(self, start, stop, step, color, left, pions_manges=False):
+    def _valid_moves_left(self, start, stop, step, color, left, pions_manges=[]):
         derniere_piece_tuee = []
         moves = {}
         for r in range(start,stop,step):
@@ -80,31 +80,29 @@ class Board:
                 
                 if pions_manges and not derniere_piece_tuee:
                     return moves
-                
+                 
+                elif pions_manges:
+                    moves[(r, left)] = derniere_piece_tuee + pions_manges
                 else:
-                    moves[(r, left)] = derniere_piece_tuee
+                    moves[(r, left)] = derniere_piece_tuee 
                     if derniere_piece_tuee:
                            
-                        moves.update(self._valid_moves_left(r+step, self._direction(step), step, color, left-1,True))
-                        print(r+step,left+1)
-                        moves.update(self._valid_moves_right(r+step, self._direction(step), step, color, left+1,True))
+                        moves.update(self._valid_moves_left(r+step, self._direction(step), step, color, left-1,pions_manges=derniere_piece_tuee))
+                        moves.update(self._valid_moves_right(r+step, self._direction(step), step, color, left+1,pions_manges=derniere_piece_tuee))
 
-                
                 return moves
             else:
-                if case_adjacente.color == color:
+                if case_adjacente.color == color or derniere_piece_tuee:
                     return moves
                 else:
                     derniere_piece_tuee = [case_adjacente]
-                    pions_manges = True
                       
             
             left -= 1
-            
         return moves
               
     
-    def _valid_moves_right(self, start, stop, step, color, right, pions_manges=False):
+    def _valid_moves_right(self, start, stop, step, color, right, pions_manges=[]):
         derniere_piece_tuee = []
         moves = {}
         for r in range(start,stop,step):
@@ -116,26 +114,28 @@ class Board:
             case_adjacente = self.board[r][right]
             if self._est_vide(case_adjacente):
                 if pions_manges and not derniere_piece_tuee:
-                    return moves
-                
-                else:
-                    moves[(r, right)] = derniere_piece_tuee
-                    if derniere_piece_tuee:
-                        
-                        moves.update(self._valid_moves_left(r+step, self._direction(step), step, color, right-1,True))
-                        moves.update(self._valid_moves_right(r+step, self._direction(step), step, color, right+1,True))
-
                     
                     return moves
+                
+                elif pions_manges:
+                    return moves     
+                else:
+                    moves[(r, right)] = derniere_piece_tuee +pions_manges
+                                        
+                    if derniere_piece_tuee:      
+                        moves.update(self._valid_moves_left(r+step, self._direction(step), step, color, right-1,pions_manges=derniere_piece_tuee))
+                        moves.update(self._valid_moves_right(r+step, self._direction(step), step, color, right+1,pions_manges=derniere_piece_tuee))
+                        print(pions_manges)
+
+                return moves
             else:
-                if case_adjacente.color == color:
+                if case_adjacente.color == color or derniere_piece_tuee:
                     return moves
                 else:
                     derniere_piece_tuee = [case_adjacente]
-                      
-            
+                    
+        
             right += 1
-            
         return moves
 
 
