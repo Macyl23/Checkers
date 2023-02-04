@@ -94,7 +94,9 @@ class Board:
                 
                 if pions_manges and not derniere_piece_tuee:
                     return moves
-                 
+                
+                elif (r,left) in moves.keys():
+                    return moves 
                 
                 else:
                     moves[(r, left)] = derniere_piece_tuee  + pions_manges
@@ -127,7 +129,10 @@ class Board:
                 
                 if pions_manges and not derniere_piece_tuee:
                     return moves
-                  
+                
+                elif (r,right) in moves.keys():
+                    return moves
+                
                 else:
                     moves[(r, right)] = pions_manges + derniere_piece_tuee
                     if derniere_piece_tuee: 
@@ -148,16 +153,19 @@ class Board:
 
         
     def _valid_moves_left_king(self, start, stop, step, color, left, piece_mangees=[], diagonal = "left"):
+        
         derniere_piece_tuee = []
         moves = {}
+        
         for r in range (start, stop, step):
             if left < 0:
                 break
             
             case_adjacente = self.board[r][left]
+            
             if self._est_vide(case_adjacente):
+                
                 if piece_mangees and not derniere_piece_tuee and diagonal != "left":
-                    
                     return moves
             
                 elif (r,left) in moves.keys():
@@ -167,7 +175,8 @@ class Board:
                     moves[(r,left)] = derniere_piece_tuee + piece_mangees
                     if derniere_piece_tuee:
                         moves.update(self._valid_moves_left_king(r+step, self._direction(step), step, color, left-1, piece_mangees=derniere_piece_tuee))
-                        moves.update(self._valid_moves_right_king(r+step, self._direction(step), step, color, left+1, piece_mangees=derniere_piece_tuee, diagonal = "left"))
+                        moves.update(self._valid_moves_right_king(r+step, self._direction(step), step, color, left+1, piece_mangees=derniere_piece_tuee))
+                        
             else:
                 if case_adjacente.color == color or derniere_piece_tuee :
                     return moves

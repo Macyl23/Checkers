@@ -17,6 +17,7 @@ class Game:
         
         
     def _init(self):
+        self.is_started = False
         self.valid_moves = {}
         self.selected = None
         self.turn = BLUE
