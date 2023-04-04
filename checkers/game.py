@@ -26,6 +26,8 @@ class Game:
     def reset(self):
         self._init()
     
+    def winner(self):
+        return self.board.winner()
     
     def choisir_piece(self, row, col):
         
@@ -71,4 +73,11 @@ class Game:
         for move in moves:
             row, col = move
             pygame.draw.circle(self.win, GREEN, (col * SQUARE_SIZE + SQUARE_SIZE//2, row * SQUARE_SIZE + SQUARE_SIZE//2), 15)
+            
+    def ai_move(self, board):
+        self.board = board
+        self.changer_tour()
+        
+    def get_board(self):
+        return self.board
     

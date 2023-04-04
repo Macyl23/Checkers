@@ -9,6 +9,8 @@ class Board:
         self.creer_grille()
         self.red_kings = 0
         self.blue_kings = 0
+        self.red_left = 12
+        self.blue_left = 12
 
     def creer_cases(self, window):
         window.fill(WHITE)
@@ -51,6 +53,13 @@ class Board:
                 self.red_kings += 1
                 
         
+    def get_all_pieces(self, color):
+        pieces = []
+        for row in self.board:
+            for piece in row:
+                if piece != 0 and piece.color == color:
+                    pieces.append(piece)
+        return pieces
         
     def get_piece(self, row, col):
         return self.board[row][col]
@@ -214,7 +223,14 @@ class Board:
             right += 1
         return moves
 
-                    
+    def winner(self):
+        if self.red_left <= 0:
+            return BLUE
+        elif self.blue_left <= 0:
+            return RED
+           
+    def evaluate(self):
+        return self.red_left - self.blue_left + (self.red_kings * 0.5 - self.blue_kings * 0.5)  
         
     
     def _direction(self, step):
@@ -227,3 +243,12 @@ class Board:
     
     def _est_vide(self, current):
         return current == 0
+    
+    def remove(self, pieces):
+        for piece in pieces:
+            self.board[piece.row][piece.col] = 0
+            if piece != 0:
+                if piece.color == RED:
+                    self.red_left -= 1
+                else:
+                    self.blue_left -= 1
