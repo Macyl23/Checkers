@@ -7,8 +7,9 @@ from .board import Board
 
 class Game:
     def __init__(self, win):
-        self.win = win
         self._init()
+        self.win = win
+        
         
     def update(self):
         self.board.ajouter_pieces_sur_grille(self.win)

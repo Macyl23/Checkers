@@ -8,15 +8,19 @@ BLUE = (46,115,154)
 
 
 
-def minimax(position, profondeur, max_player, game):
+def minimax(position, profondeur,alpha, beta, max_player, game):
     if profondeur == 0 or position.winner() != None:
         return position.evaluate(), position
     if max_player:
         maxEval = float('-inf')
         best_move = None
         for move in get_all_moves(position, RED, game):
-            evaluation = minimax(move, profondeur-1, False, game)[0]
+            evaluation = minimax(move, profondeur-1,alpha, beta, False, game)[0]
             maxEval = max(maxEval, evaluation)
+            alpha = max(alpha, maxEval)
+            if alpha >= beta:
+                best_move = move
+                return maxEval, best_move
             if maxEval == evaluation:
                 best_move = move
         return maxEval, best_move
@@ -24,8 +28,12 @@ def minimax(position, profondeur, max_player, game):
         minEval = float('+inf')
         best_move = None
         for move in get_all_moves(position, BLUE, game):
-            evaluation = minimax(move, profondeur-1, True, game)[0]
+            evaluation = minimax(move, profondeur-1,alpha,beta, True, game)[0]
             minEval = min(minEval, evaluation)
+            beta = min(minEval,beta)
+            if alpha >= beta:
+                best_move = move
+                return minEval, best_move
             if minEval == evaluation:
                 best_move = move
         return minEval, best_move

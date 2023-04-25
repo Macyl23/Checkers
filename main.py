@@ -30,7 +30,7 @@ def main():
 
         clock.tick(FPS)
         if game.turn == RED:
-            value, new_board = minimax(game.get_board(), 2, RED, game)
+            value, new_board = minimax(game.get_board(), 2,float('-inf'), float('+inf'), RED, game)
             game.ai_move(new_board)
 
         for event in pygame.event.get():
