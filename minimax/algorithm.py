@@ -10,7 +10,7 @@ BLUE = (46,115,154)
 
 def minimax_red(position, profondeur,alpha, beta, max_player, game):
     if profondeur == 0 or position.winner() != None:
-        return position.evaluate_level_one(), position
+        return position.evaluate_level_three(), position
     if max_player:
         maxEval = float('-inf')
         best_move = None
