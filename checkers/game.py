@@ -18,11 +18,11 @@ class Game:
         
         
     def _init(self):
-        self.is_started = False
-        self.valid_moves = {}
         self.selected = None
-        self.turn = BLUE
         self.board = Board()
+        self.turn = BLUE
+        self.valid_moves = {}
+        self.is_started = False
         
     def reset(self):
         self._init()

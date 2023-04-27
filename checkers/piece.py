@@ -32,6 +32,9 @@ class Piece:
         self.col = col
         self.calc_pos()
         
+    def is_king(self):
+        return self.king
+        
     def __repr__(self):
         return str(self.color)
         
