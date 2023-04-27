@@ -7,20 +7,16 @@ RED = (255,0,0)
 BLUE = (46,115,154)
 
 
-# Algorithme minimax quand le rouge est le joueur MAX
-def minimax_red(position, profondeur,alpha, beta, max_player, game):
+# Algorithme minimax sans alpha beta 
+def minimax(position, profondeur, max_player, game):
     if profondeur == 0 or position.winner() != None:
         return position.evaluate_level_one(), position
     if max_player:
         maxEval = float('-inf')
         best_move = None
         for move in get_all_moves(position, RED, game):
-            evaluation = minimax_red(move, profondeur-1,alpha, beta, False, game)[0]
+            evaluation = minimax(move, profondeur-1, False, game)[0]
             maxEval = max(maxEval, evaluation)
-            alpha = max(alpha, maxEval)
-            if alpha >= beta:
-                best_move = move
-                return maxEval, best_move
             if maxEval == evaluation:
                 best_move = move
         return maxEval, best_move
@@ -28,25 +24,21 @@ def minimax_red(position, profondeur,alpha, beta, max_player, game):
         minEval = float('+inf')
         best_move = None
         for move in get_all_moves(position, BLUE, game):
-            evaluation = minimax_red(move, profondeur-1,alpha,beta, True, game)[0]
+            evaluation = minimax(move, profondeur-1,True, game)[0]
             minEval = min(minEval, evaluation)
-            beta = min(minEval,beta)
-            if alpha >= beta:
-                best_move = move
-                return minEval, best_move
             if minEval == evaluation:
                 best_move = move
         return minEval, best_move
     
-# Algorithme minimax quand le bleu est le joueur MAX
-def minimax_blue(position, profondeur,alpha, beta, max_player, game):
+# algorithme avec élegage alpha beta pour réduire le l'arbre de recherche
+def alpha_beta(position, profondeur,alpha, beta, max_player, game):
     if profondeur == 0 or position.winner() != None:
         return position.evaluate_level_three(), position
     if max_player:
         maxEval = float('-inf')
         best_move = None
         for move in get_all_moves(position, BLUE, game):
-            evaluation = minimax_blue(move, profondeur-1,alpha, beta, False, game)[0]
+            evaluation = alpha_beta(move, profondeur-1,alpha, beta, False, game)[0]
             maxEval = max(maxEval, evaluation)
             alpha = max(alpha, maxEval)
             if alpha >= beta:
@@ -59,7 +51,7 @@ def minimax_blue(position, profondeur,alpha, beta, max_player, game):
         minEval = float('+inf')
         best_move = None
         for move in get_all_moves(position, RED, game):
-            evaluation = minimax_blue(move, profondeur-1,alpha,beta, True, game)[0]
+            evaluation = alpha_beta(move, profondeur-1,alpha,beta, True, game)[0]
             minEval = min(minEval, evaluation)
             beta = min(minEval,beta)
             if alpha >= beta:

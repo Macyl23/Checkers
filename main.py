@@ -3,7 +3,7 @@ import math
 from checkers.constants import WIDTH, HEIGHT, SQUARE_SIZE, LOGO, BACKGROUND, PLAY, BLUE, RED, IA
 from checkers.board import Board
 from checkers.game import Game
-from minimax.algorithm import minimax_red, minimax_blue
+from minimax.algorithm import minimax, alpha_beta
 
 FPS = 60
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -55,17 +55,17 @@ def main():
         #ia vs ia
         if game.ia_ia and game.winner() == None:   
             if game.turn == RED:
-                value, new_board = minimax_red(game.get_board(), 2,float('-inf'), float('+inf'), RED, game)
+                value, new_board = minimax(game.get_board(), 2,RED, game)
                 game.ai_move(new_board)
                     
             elif game.turn == BLUE:
-                value, new_board = minimax_blue(game.get_board(), 2,float('-inf'), float('+inf'), BLUE, game)
+                value, new_board = alpha_beta(game.get_board(), 2,float('-inf'), float('+inf'), BLUE, game)
                 game.ai_move(new_board)
         
         #humain vs ia
         elif game.human_ia and game.winner() == None:
              if game.turn == RED:
-                value, new_board = minimax_red(game.get_board(), 2,float('-inf'), float('+inf'), RED, game)
+                value, new_board = minimax(game.get_board(), 2,RED, game)
                 game.ai_move(new_board)
                     
         if game.winner() != None:
