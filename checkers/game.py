@@ -22,7 +22,8 @@ class Game:
         self.board = Board()
         self.turn = BLUE
         self.valid_moves = {}
-        self.is_started = False
+        self.human_ia = False
+        self.ia_ia = False
         
     def reset(self):
         self._init()

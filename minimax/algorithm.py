@@ -7,10 +7,10 @@ RED = (255,0,0)
 BLUE = (46,115,154)
 
 
-
+# Algorithme minimax quand le rouge est le joueur MAX
 def minimax_red(position, profondeur,alpha, beta, max_player, game):
     if profondeur == 0 or position.winner() != None:
-        return position.evaluate_level_three(), position
+        return position.evaluate_level_one(), position
     if max_player:
         maxEval = float('-inf')
         best_move = None
@@ -37,9 +37,11 @@ def minimax_red(position, profondeur,alpha, beta, max_player, game):
             if minEval == evaluation:
                 best_move = move
         return minEval, best_move
+    
+# Algorithme minimax quand le bleu est le joueur MAX
 def minimax_blue(position, profondeur,alpha, beta, max_player, game):
     if profondeur == 0 or position.winner() != None:
-        return position.evaluate_level_one(), position
+        return position.evaluate_level_three(), position
     if max_player:
         maxEval = float('-inf')
         best_move = None
@@ -67,7 +69,8 @@ def minimax_blue(position, profondeur,alpha, beta, max_player, game):
                 best_move = move
         return minEval, best_move
         
-        
+
+# Fonction qui change l'état du BOARD pour calculer evaluer le cout d'un coup       
 def simulate_move(piece, move, board, game, skip):
     board.change_position_sur_grille(piece, move[0], move[1])
     if skip:
@@ -75,6 +78,8 @@ def simulate_move(piece, move, board, game, skip):
         
     return board
         
+# Fonction qui recupere les coups valides pour une pièce pour ensuite estimer le meilleur coup 
+# dans l'algorithme minimax 
 def get_all_moves(board, color, game):
     moves = []
     for piece in board.get_all_pieces(color):

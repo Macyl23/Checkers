@@ -15,4 +15,5 @@ GREEN = (0,255,0)
 BACKGROUND = pygame.transform.scale(pygame.image.load('assets/background.jpg'),(WIDTH, HEIGHT))
 PLAY = pygame.transform.scale(pygame.image.load('assets/play.jpg'), (150, 50))
 LOGO = pygame.transform.scale(pygame.image.load('assets/checkers.jpg'), (250, 150))
+IA = pygame.transform.scale(pygame.image.load('assets/ia.jpg'), (150, 50))
 

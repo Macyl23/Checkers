@@ -3,6 +3,8 @@ from .constants import ROWS, COLS, SQUARE_SIZE, WHITE, BLUE, RED
 from .piece import Piece
 
 
+# Classe qui contient un dictionnaire avec les différentes cases de l'échéquier
+# Attributs: Piece rouges et bleues restantes ainsi que les pieces couronnés
 class Board:
     def __init__(self):
         self.board = []
@@ -13,6 +15,7 @@ class Board:
         self.creer_grille()
 
 
+    # Rempli la fenetre des différentes couleurs
     def creer_cases(self, window):
         window.fill(WHITE)
         for row in range(ROWS):
@@ -20,6 +23,7 @@ class Board:
                 pygame.draw.rect(window, BLUE, (row*SQUARE_SIZE,
                                  col*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
+    # Rempli le dictionnaire avec les différentes pièces 
     def creer_grille(self):
         for row in range(ROWS):
             self.board.append([])
@@ -34,6 +38,7 @@ class Board:
                 else:
                     self.board[row].append(0)
 
+    # Ajoute les pièces sur l'échéquier
     def ajouter_pieces_sur_grille(self, win):
         self.creer_cases(win)
         for row in range(ROWS):
@@ -42,6 +47,7 @@ class Board:
                 if piece != 0:
                     piece.create_piece(win)
 
+    # Permet de changer la position d'une piece
     def change_position_sur_grille(self, piece, row, col):
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
         piece.move_piece(row, col)
@@ -54,6 +60,7 @@ class Board:
                 self.red_kings += 1
                 
         
+    # Recupere toutes les pieces de la meme couleur
     def get_all_pieces(self, color):
         pieces = []
         for row in self.board:
@@ -61,14 +68,18 @@ class Board:
                 if piece != 0 and piece.color == color:
                     pieces.append(piece)
         return pieces
-        
+      
+    # Recuperer une piece précise  
     def get_piece(self, row, col):
         return self.board[row][col]
 
+    # Supprime une pièce du dictionnaire
     def eliminer_pieces(self, pieces):
         for piece in pieces:
             self.board[piece.row][piece.col] = 0
 
+    # Recupère les coups valides de toutes les pièces d'une certaine couleur
+    # on lance les deux méthodes pour vérifier les diagonales
     def valid_moves(self, piece):
         moves = {}
         left = piece.col - 1
@@ -91,6 +102,7 @@ class Board:
 
         return moves
 
+    # Permet de vérifier les coups valides sur la diagonale gauche
     def _valid_moves_left(self, start, stop, step, color, left, pions_manges=[]):
         derniere_piece_tuee = []
         moves = {}
@@ -224,6 +236,7 @@ class Board:
             right += 1
         return moves
 
+    # Retourne la couleur du gagnant si y'a un gagnat
     def winner(self):
         
         if self.red_left <= 0:
@@ -232,12 +245,15 @@ class Board:
             return RED
         return None
            
+    # Fonction d'évaluation quand le rouge est le joueur max
     def evaluate_level_one(self):
-        return self.red_left - self.blue_left  
+        return self.red_left - self.blue_left  + (self.red_kings * 0.5 - self.blue_kings * 0.5)
 
+    # Fonction d'évaluation quand le rouge est le joueur max# 
     def evaluate_level_three(self):
-        return self.red_left - self.blue_left + (0.5 * self.red_kings - 0.5 * self.blue_kings)
+        return self.blue_left - self.red_left + ( self.blue_kings * 0.5  - self.red_kings * 0.5 )
     
+    # Fonction d'évaluation d'un niveau inférieur qui essaye de controler le centre du plateau
     def evaluate_level_two(self):
         center_squares = [(3, 4), (4, 3), (3, 5), (5, 3), (4, 5), (5, 4), (4, 4), (5, 5)]
         score = 0
